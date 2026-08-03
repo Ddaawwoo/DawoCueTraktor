@@ -1,0 +1,65 @@
+name: Sestavit Windows EXE
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - master
+
+permissions:
+  contents: read
+
+jobs:
+  build-windows:
+    name: Windows EXE
+    runs-on: windows-latest
+    timeout-minutes: 35
+
+    steps:
+      - name: Stáhnout zdrojové soubory
+        uses: actions/checkout@v6
+
+      - name: Připravit Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: |
+            requirements.txt
+            requirements-build.txt
+
+      - name: Nainstalovat knihovny
+        shell: pwsh
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-build.txt
+
+      - name: Otestovat práci s NML
+        shell: pwsh
+        run: python -m unittest discover -s tests -v
+
+      - name: Sestavit samostatný EXE
+        shell: pwsh
+        run: python -m PyInstaller --noconfirm --clean DawoCueTraktor.spec
+
+      - name: Ověřit spuštění hotového EXE
+        shell: pwsh
+        run: |
+          $process = Start-Process -FilePath ".\dist\DawoCueTraktor.exe" -ArgumentList "--self-test" -Wait -PassThru
+          if ($process.ExitCode -ne 0) { exit $process.ExitCode }
+
+      - name: Připravit balíček
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Path release -Force | Out-Null
+          Copy-Item ".\dist\DawoCueTraktor.exe" ".\release\DawoCueTraktor.exe"
+          Copy-Item ".\NAVOD_GIT_CZ.md" ".\release\NAVOD_K_POUZITI.md"
+
+      - name: Nabídnout EXE ke stažení
+        uses: actions/upload-artifact@v6
+        with:
+          name: DawoCue-Traktor-Windows
+          path: release/
+          if-no-files-found: error
+          retention-days: 30

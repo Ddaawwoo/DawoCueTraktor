@@ -1,7 +1,13 @@
 # -*- mode: python ; coding: utf-8 -*-
 
+from PyInstaller.utils.hooks import collect_submodules
+
 datas = []
 binaries = []
+hiddenimports = (
+    collect_submodules("scipy._external.array_api_compat.common")
+    + collect_submodules("scipy._external.array_api_compat.numpy")
+)
 
 
 a = Analysis(
@@ -9,11 +15,11 @@ a = Analysis(
     pathex=[],
     binaries=binaries,
     datas=datas,
-    hiddenimports=[],
+    hiddenimports=hiddenimports,
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
-    excludes=["matplotlib", "IPython", "notebook", "pandas"],
+    excludes=["matplotlib", "IPython", "notebook", "pandas", "sklearn"],
     noarchive=False,
     optimize=1,
 )

@@ -2,14 +2,14 @@ from __future__ import annotations
 
 import sys
 
+from dawocue.app import run_app
+
 
 def main() -> int:
     if "--self-test" in sys.argv:
         from dawocue.self_test import run_self_test
 
         return run_self_test()
-
-    from dawocue.app import run_app
 
     run_app()
     return 0

@@ -3,6 +3,10 @@ from __future__ import annotations
 import sys
 
 from dawocue.app import run_app
+from dawocue.frozen_runtime import configure_frozen_numba_cache
+
+
+configure_frozen_numba_cache()
 
 
 def main() -> int:

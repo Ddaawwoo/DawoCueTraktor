@@ -10,8 +10,15 @@ from .traktor_nml import export_collection
 
 def run_self_test() -> int:
     try:
+        import tkinter as tk
+
         import librosa  # noqa: F401
         import soundfile  # noqa: F401
+
+        window = tk.Tk()
+        window.withdraw()
+        window.update_idletasks()
+        window.destroy()
 
         with tempfile.TemporaryDirectory(prefix="dawocue_test_") as temp_dir:
             root = Path(temp_dir)
